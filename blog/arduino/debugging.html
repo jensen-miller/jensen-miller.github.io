@@ -41,8 +41,8 @@
                             <hr />
                             <h3>Problem 1: Cross-platform development</h3>
                             <p>When you develop libraries for multiple platforms (i.e. Raspberry Pi Linux, Windows IoT, etc.) you don't want to be switching
-                            macros every where with <code>Serial.println()</code> everywhere. That is extremely tideous and painful, and not really "cross-
-                            platform". On top of that, everywhere you what to error check, you now have to put a statement foreach platform that respectively
+                            macros everywhere with <code>Serial.println()</code>. That is extremely tideous and painful, and not really "cross-
+                            platform". On top of that, everywhere you want to error check, you now have to put a statement for each platform that respectively
                             does printing.
 <pre><code>#ifdef ARDUINO
 Serial.println("Error!");
@@ -66,7 +66,7 @@ public:
                             library won't compile where it is dependent on <code>Logger::WriteLine()</code> in a deliverable. So I needed a method that was well established
                             and already cross-platform.</p>
                             <h3>Solution 2: Isn't there printf?</h3>
-                            <p>Well, yes, but not for Arduino. At the time, the only way to use <code>printf</code> on Arduino, was if you had the Azure-C-SDK.
+                            <p>Well, yes, but not for Arduino. At the time, the only way to use <code>printf</code> on Arduino was if you had the Azure-C-SDK.
                             Since I wanted the only dependency to be the C99 library, I avoided using printf for some time. Being a naive coder at the time,
                             I hadn't realized GCC libc exported the method. For those that don't know, inside of your local Arduino15/ directory, you have the
                             GCC compiler, 4.8.3-2014q1 as of writing this. See more on <a href="#">Compilers and IoT</a>. Packaged with the GCC compiler,
@@ -108,11 +108,11 @@ void loop() {
 }
 </code></pre>
                             <p>In addition to printf, I use a lot of assertions to prevent dumb mistakes. In Arduino, assert doesn't do anything other
-                            than hang the device. So implementing assert in a way that we can gather some idea of where a failure occurs leveraging
+                            than hang the device. So implementing assert in a way that provides us with an idea of where a failure occurs leveraging
                             printf is very helpful.</p>
                             <hr />
                             <p>These are just a couple of notes on Serial debugging that I hope will help, but they aren't perfect. For example,
-                            you want to avoid using <code>printf()</code> in a interrupt service routine. However, this is much more helpful than being limited
+                            you want to avoid using <code>printf()</code> in a interrupt service routine. Nevertheless, this is much more helpful than being limited
                             to <code>Serial.println()</code> in your sketch, or causing your library to become Arduino specific for a period. <b>Remember</b>
                             to initialize Serial in setup in order for the print statements to work. <b>Note</b> that because of this, you cannot use
                             <code>printf()</code> in constructors if the objects being constructed are static or at file scope. Construction would then
