@@ -1,0 +1,143 @@
+﻿<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+
+    Edited (+) 2019 Jensen Miller
+        For personal use
+-->
+<html>
+	<head>
+		<title>JM | ThoughtBubble</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+                <a href="../../index.html" class="title">JM | ThoughtBubble</a>
+				<nav>
+					<ul>
+						<li><a href="../../index.html">Home</a></li>
+						<li><a href="../blog_home.html" class="active">ThoughtBubble</a></li>						
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+                        <div class="inner">
+                            <h1 class="major">Arduino | Debugging</h1>
+                            <h2>Using Serial</h2>
+                            <p>This is the most common way to debug on Arduino... and also the most frustrating in the beginning. Here are some problems
+                            I've encountered, and the best solution that I have found.</p>
+                            <hr />
+                            <h3>Problem 1: Cross-platform development</h3>
+                            <p>When you develop libraries for multiple platforms (i.e. Raspberry Pi Linux, Windows IoT, etc.) you don't want to be switching
+                            macros every where with <code>Serial.println()</code> everywhere. That is extremely tideous and painful, and not really "cross-
+                            platform". On top of that, everywhere you what to error check, you now have to put a statement foreach platform that respectively
+                            does printing.
+<pre><code>#ifdef ARDUINO
+Serial.println("Error!");
+#elif LINUX
+... other printers ...
+#endif</code></pre>
+                            </p>
+                            <h3>Solution 1: Cross-platform statements defined in library</h3>
+                            <p>So then I decided it would be a great idea to make a debugger class a part of the library that would capture
+                            the different methods by which a platform could print. But this of course meant each platform had to have it's own
+                            implementation of the logger class. <code>Logger::WriteLine()</code></p>
+                            <pre><code>
+class Logger
+{
+public:
+    static void WriteLine(const char* format, ...);
+}</code></pre>
+                            <p>Now each platform would just implement <code>WriteLine</code> and you could then call the method anywhere in code.
+                            <h3>Problem 2: Smoothest?</h3>
+                            <p>Uh, no. I didn't want to ship a library with a logger in it. Sure you could use a .gitignore, but then the
+                            library won't compile where it is dependent on <code>Logger::WriteLine()</code> in a deliverable. So I needed a method that was well established
+                            and already cross-platform.</p>
+                            <h3>Solution 2: Isn't there printf?</h3>
+                            <p>Well, yes, but not for Arduino. At the time, the only way to use <code>printf</code> on Arduino, was if you had the Azure-C-SDK.
+                            Since I wanted the only dependency to be the C99 library, I avoided using printf for some time. Being a naive coder at the time,
+                            I hadn't realized GCC libc exported the method. For those that don't know, inside of your local Arduino15/ directory, you have the
+                            GCC compiler, 4.8.3-2014q1 as of writing this. See more on <a href="#">Compilers and IoT</a>. Packaged with the GCC compiler,
+                            is the C library, libc. libc carries all dependencies for C99, however <b>not all methods are implemented</b>.</p>
+                            <p>Inside libc include/stdio.h ...</p>
+                            <pre><code>int _EXFUN(printf, (const char *__restrict, ...)
+    _ATTRIBUTE ((__format__ (__printf__, 1, 2))));</code></pre>
+                            <p>So, just implement the method at the top of your sketch *.ino.</p>
+                            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;assert.h&gt;
+
+
+int printf(const char* __restrict format, ...)
+{
+    char buf[300];
+    va_list ap;
+    va_start(ap, format);
+    vsnprintf(buf, sizeof(buf), format, ap);
+    Serial.write(buf);
+    va_end(ap);
+    Serial.println();
+}
+
+
+void __assert_func(const char* srcFileName, int srcFileLine, const char* fnName, const char* val)
+{
+    printf("!> Assertion Failed:\n>\tIn %s on line %d\n>\tIn %s\n>\tFailed on: %s", srcFileName, srcFileLine, fnName, val);
+    abort();
+}
+
+
+void setup() {
+    Serial.begin(115200);
+}
+
+
+void loop() {
+
+}
+</code></pre>
+                            <p>In addition to printf, I use a lot of assertions to prevent dumb mistakes. In Arduino, assert doesn't do anything other
+                            than hang the device. So implementing assert in a way that we can gather some idea of where a failure occurs leveraging
+                            printf is very helpful.</p>
+                            <p>These are just a couple of notes on Serial debugging that I hope will help, but they aren't perfect. You want to avoid
+                            doing in a interrupt service routine and other things of that nature. However, this is much more helpful than only having
+                            <code>Serial.println()</code> in your sketch, or causing your library to become Arduino specific for a period. <b>Remember</b>
+                            to initialize Serial in setup in order for the print statements to work. <b>Note</b> that because of this, you cannot use
+                            <code>printf()</code> in constructors if the object being constructed is static or at file scope. Construction would then
+                            take place prior to setup, consequently before Serial is ready.</p>
+                        </div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; 2019 Jensen Miller. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="../../assets/js/jquery.min.js"></script>
+			<script src="../../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../../assets/js/browser.min.js"></script>
+			<script src="../../assets/js/breakpoints.min.js"></script>
+			<script src="../../assets/js/util.js"></script>
+			<script src="../../assets/js/main.js"></script>
+
+	</body>
+</html>
