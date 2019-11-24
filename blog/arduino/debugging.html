@@ -110,11 +110,12 @@ void loop() {
                             <p>In addition to printf, I use a lot of assertions to prevent dumb mistakes. In Arduino, assert doesn't do anything other
                             than hang the device. So implementing assert in a way that we can gather some idea of where a failure occurs leveraging
                             printf is very helpful.</p>
-                            <p>These are just a couple of notes on Serial debugging that I hope will help, but they aren't perfect. You want to avoid
-                            doing in a interrupt service routine and other things of that nature. However, this is much more helpful than only having
-                            <code>Serial.println()</code> in your sketch, or causing your library to become Arduino specific for a period. <b>Remember</b>
+                            <hr />
+                            <p>These are just a couple of notes on Serial debugging that I hope will help, but they aren't perfect. For example,
+                            you want to avoid using <code>printf()</code> in a interrupt service routine. However, this is much more helpful than being limited
+                            to <code>Serial.println()</code> in your sketch, or causing your library to become Arduino specific for a period. <b>Remember</b>
                             to initialize Serial in setup in order for the print statements to work. <b>Note</b> that because of this, you cannot use
-                            <code>printf()</code> in constructors if the object being constructed is static or at file scope. Construction would then
+                            <code>printf()</code> in constructors if the objects being constructed are static or at file scope. Construction would then
                             take place prior to setup, consequently before Serial is ready.</p>
                         </div>
 					</section>
