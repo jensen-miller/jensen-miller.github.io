@@ -37,14 +37,18 @@
                 <h1 class="major">Atmel SAM | Adapting to a CMake build system</h1>
                 <h2>Dependencies</h2>
                 <p>
-                    When developing for an Atmel SAM board (i.e. SparkFun SAMD51 ThingPlus, Adafruit Feather M0 Express), the base requirements include:
-                        - <a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm">GCC ARM Embedded Toolchain</a>
-                        - <a href="http://packs.download.atmel.com/">An Atmel DFP pack suited for your board</a>
-                    
+                    When developing for an Atmel SAM board (i.e. SparkFun SAMD51 ThingPlus, Adafruit Feather M0 Express), the base requirements include:                    
+                    <ul>
+                        <li><a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm">GCC ARM Embedded Toolchain</a></li>
+                        <li><a href="http://packs.download.atmel.com/">An Atmel DFP pack suited for your board</a></li>                        
+                    </ul>
+
                     Between these two dependencies, a program will need to know:
-                        - Include directory of CMSIS
-                        - Include directory of DFP
-                        - Linker Script location                        
+                    <ul>
+                        <li>Include directory of CMSIS</li>
+                        <li>Include directory of DFP</li>
+                        <li>Linker Script location</li>
+                    </ul>
                 </p>
                 <hr />
             </div>
